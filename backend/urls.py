@@ -20,4 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/question/', include('questionMGT.urls')),    # 掛入 questionMGT 的 urls
+    path('api/recommend/', include('recommand.urls')),    # 掛入 recommand 的 urls
+    path('api/playlist/', include('playlist.urls')),      # 掛入 playlist 的 urls
 ]
