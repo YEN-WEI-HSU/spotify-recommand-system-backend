@@ -18,6 +18,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('api/question/', include('questionMGT.urls')),    # 掛入 questionMGT 的 urls
+    path('api/member/', include('memberMGT.urls')),  # 包含 accounts 應用的 API 路由
 ]
