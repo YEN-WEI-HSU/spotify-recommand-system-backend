@@ -79,11 +79,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'spotify',
+        'USER': 'postgres',
+        'PASSWORD': 'user123',        
+        'HOST': 'localhost',
+        'PORT': '26713',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -128,5 +131,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:3001",
 ]
+  # python manage.py runserver 0.0.0.0:18500
+  # http://35.221.178.11:18500/
+
+ #CORS_ALLOW_CREDENTIALS = True
