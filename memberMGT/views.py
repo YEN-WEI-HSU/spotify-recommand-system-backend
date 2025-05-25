@@ -5,16 +5,22 @@ from rest_framework import response
 from requests import Request, post
 from django.http import HttpResponseRedirect
 from .credentials import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI
-from .extra import *
+from .services import *
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 class AuthenticationaURL(APIView):
     def get(self, request, format=None):
         scopes = "user-read-private, user-read-email, user-top-read, user-follow-read, user-follow-modify, user-library-read, user-library-modify, playlist-modify-public, playlist-modify-private, playlist-read-private, playlist-read-collaborative, playlist-modify-public, playlist-modify-private,"
-        url =Request('GET', 'https://accounts.spotify.com/authorize', params={
+        url = Request('GET', 'https://accounts.spotify.com/authorize', params={
             'scope': scopes,
             'response_type': 'code',
-            'redirect_uri': SPOTIFY_REDIRECT_URI,
-            'client_id': SPOTIFY_CLIENT_ID,
+            # 'redirect_uri': SPOTIFY_REDIRECT_URI,
+            # 'client_id': SPOTIFY_CLIENT_ID,
+            'redirect_uri': os.getenv("SPOTIFY_REDIRECT_URI"),  # Use environment variable for redirect URI
+            'client_id': os.getenv("SPOTIFY_CLIENT_ID"),  # Use environment variable for client ID
         }).prepare().url
         return HttpResponseRedirect(url)
 
@@ -52,7 +58,7 @@ def spotify_redirect(request, format=None):
     )
 
     # Create a redirect url to the current song details
-    redirect_url = ""
+    redirect_url = os.getenv("FRONTEND_URL")  #.env / gitignore
     return HttpResponseRedirect(redirect_url)
 
 # Checking whether the user has been authenticated by spotify
@@ -66,8 +72,8 @@ class CheckAuthentication(APIView):
         auth_status = is_spotify_authenticated(key)
 
         if auth_status:
-            redirect_url = ""
+            redirect_url = os.getenv("FRONTEND_URL")  # Redirect to the frontend URL
             return HttpResponseRedirect(redirect_url)
         else:
-            redirect_url = ""
+            redirect_url = "http://127.0.0.1:3000/member/login"
             return HttpResponseRedirect(redirect_url)
