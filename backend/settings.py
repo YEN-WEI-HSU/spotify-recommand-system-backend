@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-+99ar=!hob9#i-#=@s@_z-$yp@avg7jlfq^sul(oh5avx@5bih
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['35.221.178.11', 'localhost', '127.0.0.1']   #ALLOWED_HOSTS = ['*'] # 這樣會允許所有的主機訪問，這在開發階段是可以的，但在生產環境中應該限制為特定的主機名或IP地址 
+ALLOWED_HOSTS = [os.getenv("LOCAL_HOST"), os.getenv("INTERNAL_IP"), 'localhost', '127.0.0.1']   #ALLOWED_HOSTS = ['*'] # 這樣會允許所有的主機訪問，這在開發階段是可以的，但在生產環境中應該限制為特定的主機名或IP地址
 
 
 # Application definition
@@ -83,23 +83,23 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         "NAME": "Spotify",   # database 的名稱設為 Spotify
-#         "USER": "postgres",      # PostgreSQL 的 user 名稱設為 postgres
-#         "PASSWORD": "2025mitlab03",  # PostgreSQL 的 password 設為 postgres
-#         "HOST": "localhost",
-#         "PORT": "26713",
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        "NAME": "spotify",   # database 的名稱設為 Spotify
+        "USER": "postgres",      # PostgreSQL 的 user 名稱設為 postgres
+        "PASSWORD": "user123",  # PostgreSQL 的 password 設為 postgres
+        "HOST": "localhost",
+        "PORT": "26713",
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 TIME_ZONE = 'UTC'
 
@@ -120,6 +120,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    os.getenv("FRONTEND_URL"),
+    f"https://{os.getenv('LOCAL_HOST')}",
 ]
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')   # This is used to tell Django that the request is secure when using a reverse proxy like Nginx

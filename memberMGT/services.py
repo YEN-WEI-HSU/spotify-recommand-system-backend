@@ -2,7 +2,10 @@ from .models import Token
 from django.utils import timezone
 from datetime import timedelta
 from requests import post
-from .credentials import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_URL = "https://api.spotify.com/v1/me"
 
@@ -16,7 +19,13 @@ def check_tokens(session_id):
     
 # Create and update the token model
 def create_or_update_tokens(session_id, access_token, refresh_token, expires_in, token_type):
+    print(f"Creating or updating tokens for session: {session_id}")
+    print(f"Access Token: {access_token}")
+    print(f"Refresh Token: {refresh_token}")    
+    print(f"Expires In: {expires_in}")
+    print(f"Token Type: {token_type}")
     tokens = check_tokens(session_id)
+    expires_in = 3600 if expires_in is None else expires_in  # Default to 3600 seconds if not provided
     expires_in = timezone.now() + timedelta(seconds=expires_in)
 
     # Update tokens if they exist
@@ -54,8 +63,8 @@ def refresh_token_func(session_id):
     response = post("https://accounts.spotify.com/api/token", data={
         "grant_type": "refresh_token",
         "refresh_token": refresh_token,
-        "client_id": SPOTIFY_CLIENT_ID,
-        "client_secret": SPOTIFY_CLIENT_SECRET,
+        "client_id": os.getenv('SPOTIFY_CLIENT_ID'),
+        "client_secret": os.getenv('SPOTIFY_CLIENT_SECRET'),
     })
     
     access_token = response.get("access_token")
