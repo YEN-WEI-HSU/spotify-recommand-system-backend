@@ -2,11 +2,16 @@ from django.shortcuts import redirect
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import response
-from requests import Request, post
+from requests import Request, post, get
 from django.http import HttpResponseRedirect
 from .services import *
 import os
 from dotenv import load_dotenv
+from .models import Token
+from .services import generate_jwt
+from django.utils import timezone
+import datetime
+from datetime import timedelta
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -16,7 +21,19 @@ class test(APIView):
 
 class AuthenticationaURL(APIView):
     def get(self, request, format=None):
-        scopes = "user-read-private, user-read-email, user-top-read, user-follow-read, user-follow-modify, user-library-read, user-library-modify, playlist-modify-public, playlist-modify-private, playlist-read-private, playlist-read-collaborative, playlist-modify-public, playlist-modify-private,"
+        scopes = " ".join([
+            "user-read-private",
+            "user-read-email",
+            "user-top-read",
+            "user-follow-read",
+            "user-follow-modify",
+            "user-library-read",
+            "user-library-modify",
+            "playlist-modify-public",
+            "playlist-modify-private",
+            "playlist-read-private",
+            "playlist-read-collaborative",
+        ])
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
             'scope': scopes,
             'response_type': 'code',
@@ -29,6 +46,7 @@ class AuthenticationaURL(APIView):
         return HttpResponseRedirect(url)
 
 def spotify_redirect(request, format=None):
+    request.session.flush()
     code = request.GET.get("code")
     error = request.GET.get("error")
 
@@ -37,14 +55,6 @@ def spotify_redirect(request, format=None):
 
     if error:
         return error
-    
-    # response = post("https://accounts.spotify.com/api/token", data={
-    #     "grant_type": "authorization_code",
-    #     "code": code,
-    #     "redirect_uri": SPOTIFY_REDIRECT_URI,
-    #     "client_id": SPOTIFY_CLIENT_ID,
-    #     "client_secret": SPOTIFY_CLIENT_SECRET,
-    # }).json()
 
     token_response = post("https://accounts.spotify.com/api/token", data={
         "grant_type": "authorization_code",
@@ -70,20 +80,38 @@ def spotify_redirect(request, format=None):
         request.session.create()
         authKey = request.session.session_key
 
+    userInfo_response = get("https://api.spotify.com/v1/me", headers={
+        "Authorization": f"Bearer {access_token}"
+    })
+    print(f"[DEBUG] UserInfo_response URL: {userInfo_response.url}")
+    print(f"[DEBUG] User Info Response Status: {userInfo_response.status_code}")
+    print(f"[DEBUG] User Info Response Body: {userInfo_response.text}")
+    userInfo = userInfo_response.json()
+    print(f"[DEBUG] User Info Response: {userInfo}")
+    spotify_id = userInfo.get("id")
+    spotify_name = userInfo.get("display_name")
+    # userName = "test_user"  # Placeholder for user name, replace with actual user info retrieval
+
+    jwt_token = generate_jwt(spotify_id, spotify_name)
+    jwt_expires_in = timezone.now() + timedelta(days=7)
+
     create_or_update_tokens(
-        session_id=authKey,
+        session_id=spotify_id,
+        spotify_name=spotify_name,
         access_token=access_token,
         refresh_token=refresh_token,
         expires_in=expires_in,
-        token_type=token_type
+        token_type=token_type,
+        jwt_token=jwt_token,
+        jwt_expires_in=jwt_expires_in
     )
 
-    # Create a redirect url to the current song details
-    redirect_url = os.getenv("FRONTEND_URL")  #.env / gitignore
+    redirect_url = os.getenv("FRONTEND_URL")
     print(f"Redirecting to: {redirect_url}")
-    return HttpResponseRedirect(redirect_url)
+    redirect_url_with_token = f"{redirect_url}?token={jwt_token}"
 
-# Checking whether the user has been authenticated by spotify
+    return HttpResponseRedirect(redirect_url_with_token)
+
 class CheckAuthentication(APIView):
     def get(self, request, format=None):
         key = self.request.session.session_key

@@ -4,6 +4,9 @@ from datetime import timedelta
 from requests import post
 import os
 from dotenv import load_dotenv
+from django.conf import settings
+import jwt
+import datetime
 
 load_dotenv()
 
@@ -11,21 +14,21 @@ BASE_URL = "https://api.spotify.com/v1/me"
 
 # Check token
 def check_tokens(session_id):
-    tokens = Token.objects.filter(user=session_id)
+    tokens = Token.objects.filter(spotify_id=session_id)
     if tokens:
         return tokens[0]
     else:
         return None
     
 # Create and update the token model
-def create_or_update_tokens(session_id, access_token, refresh_token, expires_in, token_type):
+def create_or_update_tokens(session_id, spotify_name, access_token, refresh_token, expires_in, token_type, jwt_token, jwt_expires_in):
     print(f"Creating or updating tokens for session: {session_id}")
+    print(f"Spotify Name: {spotify_name}")
     print(f"Access Token: {access_token}")
     print(f"Refresh Token: {refresh_token}")    
     print(f"Expires In: {expires_in}")
     print(f"Token Type: {token_type}")
     tokens = check_tokens(session_id)
-    expires_in = 3600 if expires_in is None else expires_in  # Default to 3600 seconds if not provided
     expires_in = timezone.now() + timedelta(seconds=expires_in)
 
     # Update tokens if they exist
@@ -34,15 +37,20 @@ def create_or_update_tokens(session_id, access_token, refresh_token, expires_in,
         tokens.refresh_token = refresh_token
         tokens.expires_in = expires_in
         tokens.token_type = token_type
-        tokens.save(update_fields=['access_token', 'refresh_token', 'expires_in', 'token_type'])
+        tokens.jwt_token = jwt_token
+        tokens.jwt_expires_in = jwt_expires_in
+        tokens.save(update_fields=['access_token', 'refresh_token', 'expires_in', 'token_type', 'jwt_token', 'jwt_expires_in'])
 
     else:
         tokens = Token(
-            user=session_id,
+            spotify_id=session_id,
+            spotify_name=spotify_name,
             access_token=access_token,
             refresh_token=refresh_token,
             expires_in=expires_in,
-            token_type=token_type
+            token_type=token_type,
+            jwt_token=jwt_token,
+            jwt_expires_in=jwt_expires_in
         )
         tokens.save()
 
@@ -78,3 +86,14 @@ def refresh_token_func(session_id):
         expires_in=expires_in,
         token_type=token_type
     )
+
+def generate_jwt(spotify_id, spotify_name):
+    payload = {
+        'spotify_id': spotify_id,
+        'spotify_name': spotify_name,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
+        'iat': datetime.datetime.utcnow()
+    }
+    
+    token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+    return token
