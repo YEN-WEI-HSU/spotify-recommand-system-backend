@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from .models import ChatRecord
+from memberMGT.services import check_jwt_tokens
 import json
 import requests
 
@@ -14,6 +15,8 @@ DIFY_API_KEY = "app-pNJOu5gCreEDY5FpTTc0Hiok"
 @require_http_methods(["POST"])
 def ask_question(request):
     print("🚀 API 進入 /back/question/ask/")
+    jwt_token = request.headers.get("token")
+    tokens = check_jwt_tokens(jwt_token) if jwt_token else None
 
     try:
         data = json.loads(request.body)
@@ -33,7 +36,8 @@ def ask_question(request):
             json={
                 "inputs": {},
                 "query": user_question,
-                "user": "demo-user",  # 可改成真正登入帳號
+                "user": tokens.spotify_id if tokens else "demo-user",  # 使用 Spotify ID 或 demo-user
+                # "user": "demo-user",  # 可改成真正登入帳號
                 "response_mode": "blocking"
             },
             timeout=300
@@ -46,7 +50,8 @@ def ask_question(request):
             result = response.json()
             answer = result.get("answer", "Dify 沒有提供回答")
 
-            user_id = "demo-user"
+            user_id = tokens.spotify_id if tokens else "demo-user"
+            # user_id = "demo-user"
 
             # ✅ 限制只保留 5 筆聊天紀錄
             existing_records = ChatRecord.objects.filter(user_id=user_id).order_by("-timestamp")
@@ -77,7 +82,10 @@ def ask_question(request):
 @require_http_methods(["GET"])
 def chat_history(request):
     try:
-        user_id = "demo-user"  # 日後改為 request.user.username 等登入資料
+        jwt_token = request.headers.get("token")
+        tokens = check_jwt_tokens(jwt_token) if jwt_token else None
+        user_id = tokens.spotify_id if tokens else "demo-user"  # 使用 Spotify ID 或 demo-user
+        # user_id = "demo-user"  # 日後改為 request.user.username 等登入資料
         records = ChatRecord.objects.filter(user_id=user_id).order_by("-timestamp")[:5]
 
         data = [
