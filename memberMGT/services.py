@@ -1,7 +1,7 @@
 from .models import Token
 from django.utils import timezone
 from datetime import timedelta
-from requests import post
+from requests import get, post
 import os
 from dotenv import load_dotenv
 from django.conf import settings
@@ -15,6 +15,14 @@ BASE_URL = "https://api.spotify.com/v1/me"
 # Check token
 def check_tokens(session_id):
     tokens = Token.objects.filter(spotify_id=session_id)
+    if tokens:
+        return tokens[0]
+    else:
+        return None
+
+# Check jwt_token
+def check_jwt_tokens(jwt_token):
+    tokens = Token.objects.filter(jwt_token=jwt_token)
     if tokens:
         return tokens[0]
     else:

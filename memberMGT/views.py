@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import response
 from requests import Request, post, get
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from .services import *
 import os
 from dotenv import load_dotenv
@@ -129,3 +129,24 @@ class CheckAuthentication(APIView):
             redirect_url = os.getenv("FRONTEND_LOGIN_URL")
             print(f"User is not authenticated, redirecting to: {redirect_url}")
             return HttpResponseRedirect(redirect_url)
+
+def get_current_user_playlists(request):
+    jwt_token = request.GET.get('token')
+    if not jwt_token:
+        print("No JWT token provided.")
+        return None
+    
+    tokens = check_jwt_tokens(jwt_token)
+    if not tokens:
+        print("No valid tokens found for the provided JWT token.")
+        return None
+    
+    headers = {
+        "Authorization": f"Bearer {tokens.access_token}"
+    }
+    response = get('https://api.spotify.com/v1/me/playlists?limit=5', headers=headers)
+    if response.status_code != 200:
+        print("Spotify API error:", response.status_code, response.text)
+        return JsonResponse({'error': 'Spotify API error', 'detail': response.text}, status=response.status_code)
+
+    return JsonResponse(response.json(), safe=False)
