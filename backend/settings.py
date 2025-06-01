@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +29,7 @@ SECRET_KEY = 'django-insecure-+99ar=!hob9#i-#=@s@_z-$yp@avg7jlfq^sul(oh5avx@5bih
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['35.221.178.11', 'localhost', '127.0.0.1']   #ALLOWED_HOSTS = ['*'] # 這樣會允許所有的主機訪問，這在開發階段是可以的，但在生產環境中應該限制為特定的主機名或IP地址 
+ALLOWED_HOSTS = [os.getenv("LOCAL_HOST"), os.getenv("INTERNAL_IP"), 'localhost', '127.0.0.1']   #ALLOWED_HOSTS = ['*'] # 這樣會允許所有的主機訪問，這在開發階段是可以的，但在生產環境中應該限制為特定的主機名或IP地址
 
 
 # Application definition
@@ -37,9 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',         # runserver_plus (for HTTPS)
+    'rest_framework',            # REST framework
+    'rest_framework.authtoken',  # Token-based authentication (可選)
     'questionMGT',
-    'recommand',
-    'playlist',
     'corsheaders',
 ]
 
@@ -79,14 +84,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'spotify',
-        'USER': 'postgres',
-        'PASSWORD': 'user123',        
-        'HOST': 'localhost',
-        'PORT': '26713',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -131,9 +133,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3001",
+    "http://localhost:3000",
 ]
-  # python manage.py runserver 0.0.0.0:18500
-  # http://35.221.178.11:18500/
 
  #CORS_ALLOW_CREDENTIALS = True
