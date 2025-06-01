@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_extensions',         # runserver_plus (for HTTPS)
     'rest_framework',            # REST framework
     'rest_framework.authtoken',  # Token-based authentication (可選)
+    'memberMGT',
     'questionMGT',
     'corsheaders',
 ]

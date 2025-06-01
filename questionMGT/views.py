@@ -13,7 +13,7 @@ DIFY_API_KEY = "app-pNJOu5gCreEDY5FpTTc0Hiok"
 @csrf_exempt
 @require_http_methods(["POST"])
 def ask_question(request):
-    print("🚀 API 進入 /api/question/ask/")
+    print("🚀 API 進入 /back/question/ask/")
 
     try:
         data = json.loads(request.body)
