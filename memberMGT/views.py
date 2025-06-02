@@ -13,7 +13,7 @@ from django.utils import timezone
 import datetime
 from datetime import timedelta
 
-load_dotenv()  # Load environment variables from .env file
+load_dotenv(override=True)  # Load environment variables from .env file
 
 class test(APIView):
     def get(self, request, format=None):

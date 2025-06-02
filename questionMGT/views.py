@@ -8,7 +8,8 @@ import requests
 
 # 設定你的 Dify API 資訊
 DIFY_API_URL = "http://35.221.178.11/v1/chat-messages"
-DIFY_API_KEY = "app-pNJOu5gCreEDY5FpTTc0Hiok"
+# DIFY_API_KEY = "app-pNJOu5gCreEDY5FpTTc0Hiok"
+DIFY_API_KEY = "app-ivytUvhnRamFoLekM8xnHlPR"
 
 
 @csrf_exempt

@@ -14,7 +14,9 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from .env file
+load_dotenv(override=True)  # Load environment variables from .env file
+print("DB SETTINGS:", os.getenv("DB_HOST"), os.getenv("DB_PORT"))
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +31,7 @@ SECRET_KEY = 'django-insecure-+99ar=!hob9#i-#=@s@_z-$yp@avg7jlfq^sul(oh5avx@5bih
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [os.getenv("LOCAL_HOST"), os.getenv("INTERNAL_IP"), 'localhost', '127.0.0.1']   #ALLOWED_HOSTS = ['*'] # 這樣會允許所有的主機訪問，這在開發階段是可以的，但在生產環境中應該限制為特定的主機名或IP地址
+ALLOWED_HOSTS = ['35.221.178.11', os.getenv("LOCAL_HOST"), os.getenv("INTERNAL_IP"), 'localhost', '127.0.0.1']   #ALLOWED_HOSTS = ['*'] # 這樣會允許所有的主機訪問，這在開發階段是可以的，但在生產環境中應該限制為特定的主機名或IP地址
 
 
 # Application definition
@@ -88,11 +90,11 @@ DATABASES = {
         # 'ENGINE': 'django.db.backends.sqlite3',
         # 'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'spotify',
-        'USER': 'postgres',
-        'PASSWORD': 'user123',        
-        'HOST': 'localhost',
-        'PORT': '26713',
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'HOST': os.getenv("DB_HOST"),
+        'PORT': os.getenv("DB_PORT"),
     }
 }
 
@@ -140,7 +142,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:20000",
+    "https://35.221.178.11",
 ]
 
  #CORS_ALLOW_CREDENTIALS = True

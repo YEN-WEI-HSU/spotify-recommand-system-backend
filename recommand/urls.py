@@ -1,10 +1,8 @@
-
-
-
 # recommand/urls.py
 from django.urls import path
-from .views import recommend_view
+from .views import album_recommendation, track_recommendation
 
 urlpatterns = [
-    path('', recommend_view, name='recommend'),
+    path('album/', album_recommendation, name='album_recommendation'),
+    path('track/', track_recommendation, name='track_recommendation'),
 ]
