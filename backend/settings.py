@@ -15,7 +15,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv(override=True)  # Load environment variables from .env file
-print("DB SETTINGS:", os.getenv("DB_HOST"), os.getenv("DB_PORT"))
+print("DB SETTINGS:", os.getenv("DB_HOST"), os.getenv("DB_PORT"), os.getenv("BASE_URL"))
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -140,10 +140,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+BASE_URL = os.getenv("BASE_URL")
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:20000",
     "https://35.221.178.11",
 ]
+
+if BASE_URL:
+    CORS_ALLOWED_ORIGINS.append(BASE_URL)
 
  #CORS_ALLOW_CREDENTIALS = True
