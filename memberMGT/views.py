@@ -15,10 +15,6 @@ from datetime import timedelta
 
 load_dotenv(override=True)  # Load environment variables from .env file
 
-class test(APIView):
-    def get(self, request, format=None):
-        return response.Response({"message": "Hello, world!"}, status=status.HTTP_200_OK)
-
 class AuthenticationaURL(APIView):
     def get(self, request, format=None):
         scopes = " ".join([

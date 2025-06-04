@@ -5,12 +5,14 @@ from .models import ChatRecord
 from memberMGT.services import check_jwt_tokens
 import json
 import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv(override=True)  # 確保載入 .env 檔案中的環境變數
 
 # 設定你的 Dify API 資訊
-DIFY_API_URL = "http://35.221.178.11/v1/chat-messages"
-# DIFY_API_KEY = "app-pNJOu5gCreEDY5FpTTc0Hiok"
-DIFY_API_KEY = "app-ivytUvhnRamFoLekM8xnHlPR"
-
+DIFY_API_URL = os.getenv("DIFY_API_URL")
+DIFY_API_KEY = os.getenv("DIFY_API_KEY")
 
 @csrf_exempt
 @require_http_methods(["POST"])

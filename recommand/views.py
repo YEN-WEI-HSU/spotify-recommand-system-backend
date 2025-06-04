@@ -10,11 +10,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DIFY_API_KEY_TRACK = "app-86F0FXJmx6n8xTZ4c7S1yemq"
-DIFY_API_KEY_ALBUM = "app-kietQPAYpWl9uAUfJdJRSu87"
-DIFY_CHAT_ENDPOINT = "http://35.221.178.11/v1/chat-messages"
+DIFY_API_KEY_TRACK = os.getenv("DIFY_API_KEY_TRACK")
+DIFY_API_KEY_ALBUM = os.getenv("DIFY_API_KEY_ALBUM")
+DIFY_CHAT_ENDPOINT = os.getenv("DIFY_CHAT_ENDPOINT")
 JWT_SECRET = os.getenv("JWT_SECRET", "default_fallback_secret")
-JWT_ALGORITHM = "HS256"
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -42,7 +42,7 @@ def handle_recommendation(request, prompt, api_key):
         if token:
             try:
                 decoded = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-                user_id = decoded.get("spotify_id")  # ✅ 跟你memberMGT一致
+                user_id = decoded.get("spotifya_id")  # ✅ 跟你memberMGT一致
             except jwt.ExpiredSignatureError:
                 print("⚠️ JWT 已過期")
             except jwt.InvalidTokenError as e:

@@ -1,1 +1,25 @@
 .env
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables file
+.env
+
+# SQLite database
+db.sqlite3
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Pipenv lock file (optional)
+Pipfile.lock
+
+# IDE and system files
+.vscode/
+.idea/
+*.iml
+.DS_Store

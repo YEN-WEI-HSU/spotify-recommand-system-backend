@@ -1,10 +1,10 @@
 from .models import Token
+from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 from requests import get, post
-import os
 from dotenv import load_dotenv
-from django.conf import settings
+import os
 import jwt
 import datetime
 
