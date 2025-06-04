@@ -13,4 +13,4 @@ ENV PORT=$BACKEND_PORT
 ARG INTERNAL_IP
 ENV HOST=$INTERNAL_IP
 
-CMD python manage.py runserver ${HOST}:${PORT}
+CMD python manage.py migrate && python manage.py runserver ${HOST}:${PORT}
